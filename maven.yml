@@ -25,3 +25,15 @@ jobs:
           file: Dockerfile
           build: true
           tag: naren-docker-image-name:latest
+
+           - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: AKIA5CA4RZCYEXJDJO7U
+          aws-secret-access-key: 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
+          aws-region: ap-south-1
+
+      - name: Push Docker image to AWS ECR
+        run: |
+          aws ecr get-login-password --region your-aws-region | docker login --username AWS --password-stdin897708050608.dkr.ecr.ap-south-1.amazonaws.com
+          docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/naren-docker-image-name:latest
