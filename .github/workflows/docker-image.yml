@@ -25,6 +25,7 @@ jobs:
     - name: Scan Docker image with Trivy
       run: docker run --rm -v $(pwd):/work aquasec/trivy:latest --severity HIGH --no-progress my-image-name:latest
 
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
