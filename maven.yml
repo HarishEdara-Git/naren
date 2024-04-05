@@ -34,6 +34,6 @@ jobs:
           aws-region: ap-south-1
 
       - name: Push Docker image to AWS ECR
-        run: |
-          aws ecr get-login-password --region your-aws-region | docker login --username AWS --password-stdin897708050608.dkr.ecr.ap-south-1.amazonaws.com
-          docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/naren-docker-image-name:latest
+  run: |
+    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
+    docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/naren-docker-image-name:latest
