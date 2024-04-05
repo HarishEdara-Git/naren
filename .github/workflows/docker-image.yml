@@ -21,27 +21,25 @@ jobs:
 
     # Install Anchore Engine
     - name: Install Anchore Engine
-      run: |
-        docker pull docker.io/anchore/anchore-engine:v0.10.0
-        docker create --name anchore_engine docker.io/anchore/anchore-engine:v0.10.0
-        docker cp anchore_engine:/docker-compose.yaml ./docker-compose.yaml
-        docker rm anchore_engine
-        sudo apt-get update && sudo apt-get install -y python3-pip
-        pip3 install docker-compose
-        docker-compose -f docker-compose.yaml up -d
+      run: docker pull docker.io/anchore/anchore-engine:v0.10.0
+
+    # Start Anchore Engine container
+    - name: Start Anchore Engine container
+      run: docker run -d --name anchore_engine docker.io/anchore/anchore-engine:v0.10.0
 
     # Wait for Anchore Engine to start
     - name: Wait for Anchore Engine to start
-      run: docker wait anchore_engine_api_1
+      run: docker exec anchore_engine anchore-manager service wait
 
     # Scan Docker image with Anchore Engine
     - name: Scan Docker image with Anchore Engine
-      run: docker exec anchore_engine_api_1 anchore-cli image add my-image-name:latest
+      run: docker exec anchore_engine anchore-cli image add my-image-name:latest
 
     # Display Anchore Engine scan results
     - name: Display Anchore Engine scan results
-      run: docker exec anchore_engine_api_1 anchore-cli image vuln my-image-name:latest all
+      run: docker exec anchore_engine anchore-cli image vuln my-image-name:latest all
 
+    # Configure AWS credentials
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -49,8 +47,14 @@ jobs:
         aws-secret-access-key: ihcPz5tLl3zTYaMnmSTcLf1RYpxr26sel7ADFEAd
         aws-region: ap-south-1
 
+    # Login to Amazon ECR
     - name: Login to Amazon ECR
       run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
 
+    # Tag the Docker image for ECR
     - name: Tag the Docker image for ECR
-      run: docker
+      run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
+
+    # Push Docker image to Amazon ECR
+    - name: Push Docker image to Amazon ECR
+      run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
