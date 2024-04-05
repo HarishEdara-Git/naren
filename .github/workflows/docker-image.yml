@@ -19,6 +19,9 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
+    - name: Pull Trivy image
+      run: docker pull aquasec/trivy:latest
+
     - name: Scan Docker image with Trivy
       run: docker run --rm -v $(pwd):/work aquasec/trivy:latest --exit-code 1 --severity HIGH --no-progress my-image-name:latest
 
