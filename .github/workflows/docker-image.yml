@@ -11,67 +11,44 @@ permissions: write-all
 jobs:
 
   build-and-push-to-ecr:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
- 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:latest
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    trivy-scanning:
-     - name: Run Trivy vulnerability scanner
-       uses: aquasecurity/trivy-action@main
-       steps:
-       - name: Checkout Repository
-         uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:latest
 
-       - name: Run Trivy vulnerability scanner in repo mode
-         uses: aquasecurity/trivy-action@master
-         with:
+  trivy-scanning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'HIGH,CRITICAL'
 
-       - name: Upload Trivy scan results to GitHub Security tab
-         uses: github/codeql-action/upload-sarif@v1
-         with:
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
           sarif_file: 'trivy-results.sarif'
 
-       - name: Build an image from Dockerfile
-         run: |
+      - name: Build an image from Dockerfile
+        run: |
           docker build -t docker.io/devops-counsel/py-app:${{ github.sha }} .
-      
-       - name: Run Trivy vulnerability scanner on Docker image
-         uses: aquasecurity/trivy-action@master
-         with:
+
+      - name: Run Trivy vulnerability scanner on Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
           image-ref: 'docker.io/devops-counsel/py-app:${{ github.sha }}'
           format: 'table'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-
-    # Configure AWS credentials
-     - name: Configure AWS credentials
-       uses: aws-actions/configure-aws-credentials@v2
-       with:
-        aws-access-key-id: AKIA5CA4RZCYEXJDJO7U
-        aws-secret-access-key: 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
-        aws-region: ap-south-1
-
-    # Login to Amazon ECR
-     - name: Login to Amazon ECR
-       run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
-
-    # Tag the Docker image for ECR
-     - name: Tag the Docker image for ECR
-       run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
-
-    # Push Docker image to Amazon ECR
-     - name: Push Docker image to Amazon ECR
-       run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
-
-
