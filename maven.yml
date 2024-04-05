@@ -24,3 +24,4 @@ jobs:
           context: .
           file: Dockerfile
           build: true
+          tag: naren-docker-image-name:latest
