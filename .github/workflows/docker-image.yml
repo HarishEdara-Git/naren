@@ -24,11 +24,8 @@ jobs:
       run: docker pull aquasec/trivy:latest
 
     # Run Trivy vulnerability scanner
-    - name: Scan Docker image with Trivy
-      run: |
-            docker run --rm -v $(pwd):/work aquasec/trivy:latest my-image-name:latest
-
-
+    - name: Run Trivy vulnerability scanner
+      run: docker run --rm -v $(pwd):/work aquasec/trivy:latest my-image-name:latest
 
     # Configure AWS credentials
     - name: Configure AWS credentials
