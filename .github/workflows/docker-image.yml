@@ -19,9 +19,13 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
+    - name: Pull Trivy Docker image
+      run: docker pull aquasec/trivy:latest
+
     - name: Scan Docker image with Trivy
-      run: |
-        docker run --rm -v $(pwd):/workdir aquasec/trivy:latest image --exit-code 0 --severity HIGH,CRITICAL my-image-name:latest
+       run:
+    docker run --rm -v $(pwd):/workdir aquasec/trivy:latest image --exit-code 0 --severity HIGH,CRITICAL my-image-name:latest
+
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
