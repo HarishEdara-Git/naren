@@ -8,11 +8,30 @@ on:
 
 jobs:
 
-  build:
+  build-and-push-to-ecr:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: AKIA5CA4RZCYEXJDJO7U
+        aws-secret-access-key: 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
+        aws-region: ap-south-1
+
+    - name: Login to Amazon ECR
+      run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
+
+    - name: Tag the Docker image for ECR
+      run: docker tag my-image-name:$(date +%s) 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions/my-image-name:latest
+
+    - name: Push Docker image to Amazon ECR
+      run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions/my-image-name:latest
+
