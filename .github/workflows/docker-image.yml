@@ -19,13 +19,28 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
-    - name: Pull Trivy Docker image
-      run: docker pull aquasec/trivy:latest
+    # Install Anchore Engine
+    - name: Install Anchore Engine
+      run: |
+        docker pull docker.io/anchore/anchore-engine:latest
+        docker create --name anchore_engine docker.io/anchore/anchore-engine:latest
+        docker cp anchore_engine:/docker-compose.yaml ./docker-compose.yaml
+        docker rm anchore_engine
+        sudo apt-get update && sudo apt-get install -y python3-pip
+        pip3 install docker-compose
+        docker-compose -f docker-compose.yaml up -d
 
-    - name: Scan Docker image with Trivy
-       run:
-    docker run --rm -v $(pwd):/workdir aquasec/trivy:latest image --exit-code 0 --severity HIGH,CRITICAL my-image-name:latest
+    # Wait for Anchore Engine to start
+    - name: Wait for Anchore Engine to start
+      run: docker wait anchore_engine_api_1
 
+    # Scan Docker image with Anchore Engine
+    - name: Scan Docker image with Anchore Engine
+      run: docker exec anchore_engine_api_1 anchore-cli image add my-image-name:latest
+
+    # Display Anchore Engine scan results
+    - name: Display Anchore Engine scan results
+      run: docker exec anchore_engine_api_1 anchore-cli image vuln my-image-name:latest all
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
