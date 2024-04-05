@@ -30,9 +30,9 @@ jobs:
       run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
 
     - name: Tag the Docker image for ECR
-      run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions/my-image-name:latest
+      run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
 
     - name: Push Docker image to Amazon ECR
-      run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions/my-image-name:latest
+      run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
 
 
