@@ -20,7 +20,7 @@ jobs:
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
     - name: Run Trivy vulnerability scanner
-        uses:aquasecurity/trivy-action@main
+       uses:aquasecurity/trivy-action@main
 
     # Configure AWS credentials
     - name: Configure AWS credentials
