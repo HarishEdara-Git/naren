@@ -19,29 +19,13 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
-    # Install Anchore Engine
-    - name: Install Anchore Engine
-      run: docker pull docker.io/anchore/anchore-engine:v0.10.0
+    # Install Trivy
+    - name: Install Trivy
+      run: docker pull aquasec/trivy:latest
 
-    # Start Anchore Engine container
-    - name: Start Anchore Engine container
-      run: docker run -d --name anchore_engine docker.io/anchore/anchore-engine:v0.10.0
-
-    # Wait for Anchore Engine to start
-    - name: Wait for Anchore Engine to start
-      run: |
-        until docker exec anchore_engine anchore-cli system status >/dev/null 2>&1; do
-          echo "Waiting for Anchore Engine to start..."
-          sleep 5
-        done
-
-    # Scan Docker image with Anchore Engine
-    - name: Scan Docker image with Anchore Engine
-      run: docker exec anchore_engine anchore-cli image add my-image-name:latest
-
-    # Display Anchore Engine scan results
-    - name: Display Anchore Engine scan results
-      run: docker exec anchore_engine anchore-cli image vuln my-image-name:latest all
+    # Run Trivy vulnerability scanner
+    - name: Run Trivy vulnerability scanner
+      run: docker run --rm -v $(pwd):/work aquasec/trivy:latest --exit-code 1 --severity HIGH --no-progress my-image-name:latest
 
     # Configure AWS credentials
     - name: Configure AWS credentials
