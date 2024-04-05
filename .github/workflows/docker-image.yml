@@ -19,13 +19,13 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:latest
 
-    # Install Trivy
-    - name: Install Trivy
-      run: docker pull aquasec/trivy:latest
-
-    # Run Trivy vulnerability scanner
     - name: Run Trivy vulnerability scanner
-      run: docker run --rm -v $(pwd):/work aquasec/trivy:latest my-image-name:latest
+        uses:aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/devops-counsel/py-app:${{ github.sha }}'
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
     # Configure AWS credentials
     - name: Configure AWS credentials
