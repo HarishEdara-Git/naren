@@ -29,6 +29,10 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
+      # Tag the Docker image
+      - name: Tag the Docker image
+        run: docker tag my-image-name:latest ***.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
+
   push-to-ecr:
     runs-on: ubuntu-latest
 
@@ -45,8 +49,6 @@ jobs:
       - name: Login to Amazon ECR
         run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
 
-      - name: Tag the Docker image for ECR
-        run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
-
+      # Push Docker image to Amazon ECR
       - name: Push Docker image to Amazon ECR
         run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
