@@ -19,7 +19,7 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions:latest
+          docker build . --file Dockerfile --tag 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions:latest
 
       # Run Trivy vulnerability scanner on Docker image
       - name: Run Trivy vulnerability scanner
