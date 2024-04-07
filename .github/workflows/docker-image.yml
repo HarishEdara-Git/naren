@@ -23,7 +23,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'naren:latest'  # Referencing the locally built Docker image
+          image-ref: 'my-image-name:latest'  # Referencing the locally built Docker image
           format: 'table'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
