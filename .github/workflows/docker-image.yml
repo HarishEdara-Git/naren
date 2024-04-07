@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: trivy-scan-results
-          path: ${{ steps.trivy-scan.outputs.trivy-output-path }}
+          path: trivy_scan_results
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
