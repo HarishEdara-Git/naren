@@ -21,7 +21,10 @@ jobs:
         run: |
           docker build . --file Dockerfile --tag my-image-name:latest --no-cache
           docker images  # Output the list of images for debugging
-
+          
+      - name: Tag the Docker image for ECR
+        run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions:latest
+        
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
