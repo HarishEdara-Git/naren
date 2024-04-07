@@ -13,10 +13,6 @@ jobs:
   build-and-scan:
     runs-on: ubuntu-latest
 
-    container:  # Use a Docker container to ensure Trivy is available
-      image: docker:20.10.7
-      options: --privileged  # Enable privileged mode to allow Docker commands
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -24,11 +20,13 @@ jobs:
       - name: Build the Docker image
         run:  docker build . --file Dockerfile --tag naren:latest
 
-      # Run Trivy vulnerability scanner
       - name: Run Trivy vulnerability scanner
-        run: |
-          docker pull aquasecurity/trivy:latest
-          docker run --rm -v $(pwd):/workdir -w /workdir aquasecurity/trivy --format table --vuln-type os,library --severity CRITICAL,HIGH naren:latest
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'naren:latest'  # Referencing the locally built Docker image
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
   push-to-ecr:
     runs-on: ubuntu-latest
@@ -46,6 +44,5 @@ jobs:
       - name: Login to Amazon ECR
         run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
 
-      # Push Docker image to Amazon ECR
       - name: Push Docker image to Amazon ECR
         run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions:latest
