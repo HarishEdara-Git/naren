@@ -25,17 +25,15 @@ jobs:
           format: 'table'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-      - name: Run Trivy vulnerability scanner
-        run: |
-          mkdir -p trivy_scan_results
-      - name: Wait for Trivy scan to complete
-        run: sleep 10s
 
+      - name: Wait for Trivy scan to complete
+        run: sleep 15s
       - name: Store Trivy scan results
+        if: always()  # Ensure this step runs even if previous steps fail
         uses: actions/upload-artifact@v2
         with:
           name: trivy-scan-results
-          path: trivy_scan_results
+          path: /root/.cache/trivy/results.json
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
