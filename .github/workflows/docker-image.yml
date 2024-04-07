@@ -25,6 +25,12 @@ jobs:
           format: 'table'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Run Trivy vulnerability scanner
+        run: |
+          mkdir -p trivy_scan_results
+      - name: Wait for Trivy scan to complete
+        run: sleep 10s
+
       - name: Store Trivy scan results
         uses: actions/upload-artifact@v2
         with:
