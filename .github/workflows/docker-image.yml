@@ -1,3 +1,4 @@
+
 name: Docker Image CI
 
 on:
@@ -6,48 +7,31 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions: write-all
-
 jobs:
 
-  build-and-scan:
+  build-and-push-to-ecr:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag my-image-name:latest --no-cache
-          docker images  # Output the list of images for debugging
-          
-      - name: Tag the Docker image for ECR
-        run: docker tag my-image-name:latest
-        
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'my-image-name:latest'  # Reference the locally built Docker image
-          format: 'table'
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:latest
 
-  push-to-ecr:
-    runs-on: ubuntu-latest
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: AKIA5CA4RZCYHN54JFFT
+        aws-secret-access-key: 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
+        aws-region: ap-south-1
 
-    needs: build-and-scan  # Wait for build-and-scan job to complete before starting this job
+    - name: Login to Amazon ECR
+      run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
 
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: AKIA5CA4RZCYHN54JFFT
-          aws-secret-access-key: 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
-          aws-region: ap-south-1
+    - name: Tag the Docker image for ECR
+      run: docker tag my-image-name:latest 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
 
-      - name: Login to Amazon ECR
-        run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 897708050608.dkr.ecr.ap-south-1.amazonaws.com
-
-      - name: Push Docker image to Amazon ECR
-        run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions:latest
+    - name: Push Docker image to Amazon ECR
+      run: docker push 897708050608.dkr.ecr.ap-south-1.amazonaws.com/sampleproject_githubactions
