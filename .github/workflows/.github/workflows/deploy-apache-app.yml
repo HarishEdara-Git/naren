@@ -6,10 +6,10 @@ on:
       - main
 
 env:
-  CLUSTER_NAME: your-cluster-name
-  NAMESPACE: your-namespace
-  AWS_REGION: your-region
-  IMAGE_REPO: your-ecr-repository
+  CLUSTER_NAME: harisheks
+  NAMESPACE: my-namespace
+  AWS_REGION: ap-south-1
+  IMAGE_REPO: sampleproject_githubactions
   IMAGE_TAG: latest
 
 jobs:
